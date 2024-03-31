@@ -20,7 +20,6 @@ public class Car : MonoBehaviour
 
     private bool _hasPackage;
     private bool _isJumping;
-    private bool _isDoubleJumping;
 
 
     void Update()
@@ -52,10 +51,9 @@ public class Car : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-       if (other.gameObject.CompareTag("Ground") || _isDoubleJumping)
+       if (other.gameObject.CompareTag("Ground"))
         {
             _isJumping = false;
-            _isDoubleJumping = !_isDoubleJumping;
         }
     }
 
