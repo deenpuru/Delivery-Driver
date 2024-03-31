@@ -9,6 +9,8 @@ TagManager:
   - Tiny
   - Normal
   - Big
+  - Ground
+  - ExtraJump
   layers:
   - Default
   - TransparentFX

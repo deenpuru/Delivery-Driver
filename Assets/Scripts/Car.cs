@@ -19,7 +19,8 @@ public class Car : MonoBehaviour
     [SerializeField] private Color32 _noPackageColor = new Color32(1, 1, 1, 1);
 
     private bool _hasPackage;
-    private bool _jumpOnce;
+    private bool _isJumping;
+    private bool _isDoubleJumping;
 
 
     void Update()
@@ -41,11 +42,21 @@ public class Car : MonoBehaviour
         {
             gameObject.GetComponent<SpriteRenderer>().flipX = false;
         }
-        if (Input.GetKeyUp(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && !_isJumping)
         {
-            rb.AddForce(new Vector3(0,_jumpHeight,0), ForceMode2D.Impulse);
+            _isJumping = true;
+            rb.AddForce(new Vector2(rb.velocity.x, _jumpHeight));
         }
       
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+       if (other.gameObject.CompareTag("Ground") || _isDoubleJumping)
+        {
+            _isJumping = false;
+            _isDoubleJumping = !_isDoubleJumping;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -54,7 +65,7 @@ public class Car : MonoBehaviour
         {
             _hasPackage = true;
             Debug.Log("Package is picked up");
-            Destroy(other.gameObject,_destroyDelay);
+            Destroy(other.gameObject, _destroyDelay);
             gameObject.GetComponent<SpriteRenderer>().color = _noPackageColor;
         }
 
@@ -65,19 +76,31 @@ public class Car : MonoBehaviour
             gameObject.GetComponent<SpriteRenderer>().color = _hasPackageColor;
         }
 
-        if (other.tag == "Tiny")
+        if (other.tag == ("ExtraJump"))
         {
-            transform.localScale = new Vector3(_turnTiny, _turnTiny,0);
-        }
-        
-        if (other.tag == "Normal")
-        {
-            transform.localScale = new Vector3(_turnNormal, _turnNormal, 0);
+            Debug.Log("touched the extra jump cube");
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Debug.Log("Jump");
+                rb.AddForce(new Vector2(rb.velocity.x, _jumpHeight));
+            }
         }
 
-        if (other.tag == "Big")
+
+        switch (other.tag)
         {
-            transform.localScale = new Vector3(_turnBig, _turnBig, 0);
+            case "Tiny":
+                transform.localScale = new Vector3(_turnTiny, _turnTiny, 0);
+                break;
+            case "Normal":
+                transform.localScale = new Vector3(_turnNormal, _turnNormal, 0);
+                break;
+            case "Big":
+                transform.localScale = new Vector3(_turnBig, _turnBig, 0);
+                break;
+            default:
+                break;
         }
     }
 }
+
